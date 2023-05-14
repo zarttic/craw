@@ -3,8 +3,6 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
-import time
-import random
 
 import filter
 
@@ -61,44 +59,28 @@ class GithubFollower:
             print("end")
             # time.sleep(random.random() + random.randrange(0, 2))
 
-    # 定义实例方法
+    # 获取用户列表
     def get_follower_names(self):
         print('[INFO]: 正在获取%s的所有followers用户名...' % self.target_username)
         page = 0
         follower_names = []
         headers = self.headers.copy()
         while True:
-            print(page)
             page += 1
             followers_url = f'https://github.com/{self.target_username}?page={page}&tab=followers'
             try:
                 response = requests.get(followers_url, headers=headers, timeout=15)
                 html = response.text
-                # print(html)
                 if 've reached the end' in html:
                     break
                 soup = BeautifulSoup(html, 'lxml')
                 pattern = r'(?<=>)[a-zA-Z0-9]+(?=<)'
                 for name in soup.find_all('span', class_='Link--secondary'):
-
-                    # print(name)
                     match = re.search(pattern, str(name))
-                    # print(match)
                     if match:
-                        # print(match.group())
                         follower_names.append(match.group())
 
             except:
                 pass
-            # time.sleep(random.random() + random.randrange(0, 2))
             headers.update({'Referer': followers_url})
-        # print('[INFO]: 成功获取%s的%s个followers用户名...' % (self.target_username, len(follower_names)))
         return follower_names
-
-
-# 创建类的实例对象并调用 getfollowernames 方法获取目标用户的 followers 名称列表
-# # github_follower = GithubFollower('YunaiV', {'Content-Type': 'application/json'})
-# github_follower = GithubFollower('iwnfy', {'Content-Type': 'application/json'})
-# followers = github_follower.getfollowernames()
-# # print(followers)
-# github_follower.analyse(followers)
